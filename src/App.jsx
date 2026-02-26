@@ -1048,7 +1048,7 @@ const style = `
   @media (max-width: 480px) {
     #home, #about, #image, #skills, #contact { padding-left: 5%; padding-right: 5%; }
     .avatar-frame { width: 180px; height: 180px; }
-    .slide { height: 300px; }
+    .slide { height: 250px; }
     .slide-title { font-size: 1.8rem; }
     .contact-form { padding: 1.5rem; }
   }
@@ -1292,7 +1292,7 @@ export default function Portfolio() {
           </div>
         </div>
         <div className="slider-container fade-in">
-          {/* SLIDE UTAMA */}
+          
           <div className="slider-track-wrapper">
             <div
               className="slider-track"
