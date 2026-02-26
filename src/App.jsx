@@ -1058,11 +1058,11 @@ const style = `
 `;
 
 const slides = [
-  { id: 1, src: "/src/Image/CCSE.jpg", title: "CCSE", desc: "Certificate CCSE" },
-  { id: 2, src: "/src/Image/DicodingDev.jpg", title: "Dicoding", desc: "Certificate Dicoding Developer" },
-  { id: 3, src: "/src/Image/HTML.jpg", title: "HTML", desc: "Certificate HTML" },
-  { id: 4, src: "/src/Image/Python-Algorithm.png", title: "Algorithm with Python", desc: "Certificate Python Algorithm" },
-  { id: 5, src: "/src/Image/Python-Lanjutan.jpg", title: "Python Lanjutan", desc: "Certificate Python Lanjutan" },
+  { id: 1, src: "/public/Image/CCSE.jpg", title: "CCSE", desc: "Certificate CCSE" },
+  { id: 2, src: "/public/Image/DicodingDev.jpg", title: "Dicoding", desc: "Certificate Dicoding Developer" },
+  { id: 3, src: "/public/Image/HTML.jpg", title: "HTML", desc: "Certificate HTML" },
+  { id: 4, src: "/public/Image/Python-Algorithm.png", title: "Algorithm with Python", desc: "Certificate Python Algorithm" },
+  { id: 5, src: "/Image/Python-Lanjutan.jpg", title: "Python Lanjutan", desc: "Certificate Python Lanjutan" },
 ];
 
 const skillCategories = [
