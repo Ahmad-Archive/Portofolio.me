@@ -1287,7 +1287,7 @@ export default function Portfolio() {
           <div className="fade-in">
             <p className="section-label">Portfolio</p>
             <h2 className="section-title">
-              Work <span className="accent">Gallery</span>
+              Certificate <span className="accent">Gallery</span>
             </h2>
           </div>
         </div>
