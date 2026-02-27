@@ -28,7 +28,7 @@ const style = `
     overflow-x: hidden;
   }
 
-  /* SCROLLBAR */
+
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: var(--purple-deep); }
   ::-webkit-scrollbar-thumb { background: var(--purple-core); border-radius: 3px; }
@@ -1038,7 +1038,7 @@ const style = `
     .hamburger { display: flex; }
     .hero-inner { padding-top: 2rem; }
     .avatar-frame { width: 220px; height: 220px; }
-    .slide { height: 380px; }
+    .slide { height: 340px; }
     .form-row { grid-template-columns: 1fr; }
     .skills-header { flex-direction: column; align-items: flex-start; }
     .about-cards { grid-template-columns: 1fr; }
