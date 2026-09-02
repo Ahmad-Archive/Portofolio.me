@@ -10,7 +10,7 @@ const items = [
 
 export default function GalleryCarousel() {
   const [activeIndex, setActiveIndex] = useState(2);
-  const [isPaused, setIsPaused] = useState(false);
+  const [isPaused] = useState(false);
 
   const handlePrev = () => {
     setActiveIndex((prev) => (prev > 0 ? prev - 1 : items.length - 1));

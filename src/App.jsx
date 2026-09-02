@@ -50,7 +50,7 @@ const style = `
       transparent 100%
     );
     background-image: linear-gradient(rgba(235,237,236,0.1) 2px, transparent 2px),
-                      linear-gradient(90deg, rgba(124,58,237,0.1) 2px, transparent 2px);
+                      linear-gradient(90deg, rgba(235,237,236,0.1) 2px, transparent 2px);
     background-size: 60px 60px;
     mask-image: radial-gradient(
       200px circle at var(--x, -500px) var(--y, -500px),
@@ -341,63 +341,43 @@ const style = `
   }
 
   .hero-visual {
-    flex: 1;
+    position: relative;
     display: flex;
-    justify-content: center;
     align-items: center;
-    animation: fadeInRight 1s 0.4s ease both;
+    justify-content: center;
+    width: 100%;
+    max-width: 420px;
+    aspect-ratio: 1 / 1;
+    margin: 0 auto;
   }
   .avatar-frame {
+    position: absolute;
+    width: 80%;
+    height: 80%;
+    background: radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.15) 0%,
+      rgba(255, 255, 255, 0) 70%
+    );
+    border-radius: 50%;
+    filter: blur(45px);
+    z-index: 1;
+  }
+  .avatar {
     position: relative;
-    width: 320px; height: 320px;
+    z-index: 2;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    transform: scaleX(-1);
+    filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.8));
+    animation: floatProfile 6s ease-in-out infinite;
   }
-  .avatar-ring {
-    position: absolute;
-    inset: -20px;
-    border-radius: 50%;
-    border: 1px solid transparent;
-    background: linear-gradient(135deg, var(--purple-core), transparent 60%) border-box;
-    animation: spinRing 6s linear infinite;
+  @keyframes floatProfile {
+    0%, 100% { transform: translateY(0px) scaleX(-1); }
+    50% { transform: translateY(-12px) scaleX(-1); }
   }
-  .avatar-ring-2 {
-    position: absolute;
-    inset: -10px;
-    border-radius: 50%;
-    border: 1px dashed rgba(168,85,247,0.3);
-    animation: spinRing 10s linear infinite reverse;
-  }
-  @keyframes spinRing {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-  .avatar-inner {
-    width: 100%; height: 100%;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--purple-mid), var(--purple-core));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 5rem;
-    font-weight: 700;
-    box-shadow: 0 0 60px rgba(124,58,237,0.5), inset 0 0 40px rgba(0,0,0,0.3);
-    position: relative;
-    overflow: hidden;
-  }
-  .avatar-inner::before {
-    content: '';
-    position: absolute;
-    top: -50%; left: -50%;
-    width: 200%; height: 200%;
-    background: conic-gradient(transparent, rgba(168,85,247,0.1), transparent 30%);
-    animation: spinRing 4s linear infinite;
-  }
-  .avatar-stats {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
+
   .stat-card {
     background: rgba(26,5,51,0.9);
     border: 1px solid var(--glass-border);
@@ -991,21 +971,8 @@ export default function Portfolio() {
             </div>
           </div>
           <div className="hero-visual">
-            <div className="avatar-frame">
-              <div className="avatar-ring" />
-              <div className="avatar-ring-2" />
-              <div className="avatar-inner">✦</div>
-              <div className="avatar-stats">
-                <div className="stat-card stat-card-left">
-                  <strong>Coming Soon</strong>
-                  Projects Done
-                </div>
-                <div className="stat-card stat-card-right">
-                  <strong>Coming Soon</strong>
-                  Client Rating
-                </div>
-              </div>
-            </div>
+            <div className="avatar-frame" />
+            <img src="/Image/Ahmad.png" alt="avatar" className="avatar" />
           </div>
         </div>
       </section>
