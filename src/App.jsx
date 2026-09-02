@@ -1,4 +1,8 @@
 import { useState, useEffect, useRef } from "react";
+import CursorRevealBg from "./components/CursorRevealBg";
+import GalleryCarousel from "./components/GalleryCarousel";
+import "@fontsource/plus-jakarta-sans"
+import "@fontsource-variable/inter/wght.css"
 
 const style = `
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
@@ -6,43 +10,65 @@ const style = `
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
-    --purple-deep: #1a0533;
-    --purple-mid: #3b0764;
+    --white-snow: #f8fbf8;
     --purple-core: #7c3aed;
-    --purple-bright: #a855f7;
-    --purple-light: #d8b4fe;
+    --charcoal: #00101d;
+    --purple-light: #c1c7cd;
     --purple-glow: #c084fc;
-    --white: #ffffff;
+    --gray: #54545a;
     --white-soft: #f5f0ff;
     --text-muted: #c4b5d4;
     --glass: rgba(255,255,255,0.06);
-    --glass-border: rgba(168,85,247,0.25);
+    --glass-border: #192126;
   }
 
   html { scroll-behavior: smooth; }
 
   body {
     font-family: 'DM Sans', sans-serif;
-    background: var(--purple-deep);
-    color: var(--white);
+    background: var(--charcoal);
+    color: var(--white-snow);
     overflow-x: hidden;
   }
 
 
   ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: var(--purple-deep); }
+  ::-webkit-scrollbar-track { background: var(--white-snow); }
   ::-webkit-scrollbar-thumb { background: var(--purple-core); border-radius: 3px; }
 
-  /* BACKGROUND GRID */
-  .bg-grid {
+  /* LAPISAN YANG TERBONGKAR SAAT KURSOR LEWAT */
+  .revealed-layer {
     position: fixed;
     inset: 0;
-    background-image:
-      linear-gradient(rgba(124,58,237,0.07) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(124,58,237,0.07) 1px, transparent 1px);
-    background-size: 60px 60px;
     pointer-events: none;
-    z-index: 0;
+    z-index: 1;
+    /* Ubah tampilan background ini sesuai keinginanmu:
+       Bisa warna gradasi terang, pattern grid, atau gambar */
+    background: radial-gradient(
+      circle at center,
+      rgba(124, 58, 237, 0.4) 0%,
+      rgba(59, 130, 246, 0.3) 70%,
+      transparent 100%
+    );
+    background-image: linear-gradient(rgba(235,237,236,0.1) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(124,58,237,0.1) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(
+      200px circle at var(--x, -500px) var(--y, -500px),
+      black 0%,
+      transparent 100%
+    );
+    -webkit-mask-image: radial-gradient(
+      200px circle at var(--x, -500px) var(--y, -500px),
+      black 0%,
+      transparent 100%
+    );
+    will-change: mask-image;
+  }
+
+  .main-content {
+    position: relative;
+    z-index: 2; /* Mengapung di atas layer background */
   }
 
   .bg-orb {
@@ -55,13 +81,13 @@ const style = `
   }
   .bg-orb-1 {
     width: 500px; height: 500px;
-    background: radial-gradient(circle, #7c3aed, transparent);
+    background: radial-gradient(circle, #889283, transparent);
     top: -150px; right: -100px;
-    animation: floatOrb 8s ease-in-out infinite;
+    animation: floatOrb 7s ease-in-out infinite;
   }
   .bg-orb-2 {
     width: 400px; height: 400px;
-    background: radial-gradient(circle, #a855f7, transparent);
+    background: radial-gradient(circle, #f9f9f9, transparent);
     bottom: 20%; left: -100px;
     animation: floatOrb 10s ease-in-out infinite reverse;
   }
@@ -72,44 +98,61 @@ const style = `
 
   .navbar {
     position: fixed;
-    top: 0; left: 0; right: 0;
+    top: 16px; left: 50%;
+    transform: translateX(-50%);
     z-index: 100;
-    padding: 0 5%;
+    width: 100%;
+    padding: 0 16px;
     height: 70px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    transition: all 0.4s ease;
+    transition: width 0.7s ease, border-radius 0.7s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.5s ease,
+    box-shadow 0.5s ease, backdrop-filter 0.5s ease;
+    background: transparent;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+    box-shadow: 0 0 0 rgba(0,0,0,0.0);
   }
   .navbar.scrolled {
-    background: rgba(26, 5, 51, 0.9);
+    background: #192126;
     backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--glass-border);
+    border: 1px solid var(--glass-border);
     box-shadow: 0 4px 30px rgba(124,58,237,0.15);
+    border-radius: 25px;
+    width: 70%;
+    margin: 0 auto;
   }
 
   .nav-logo {
     font-family: 'Cormorant Garamond', serif;
     font-size: 1.8rem;
     font-weight: 700;
-    color: var(--white);
+    color: var(--white-snow);
     cursor: pointer;
     letter-spacing: 1px;
     display: flex;
     align-items: center;
     gap: 6px;
+    transition: width 0.7s ease;
+  }
+  .navbar.scrolled .nav-logo {
+    color: var(--white-snow);
   }
   .nav-logo span {
-    background: linear-gradient(135deg, var(--purple-core), var(--purple-bright));
+    background: linear-gradient(135deg, var(--white-snow), var(--gray));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
-  .logo-dot {
-    width: 8px; height: 8px;
-    background: var(--purple-bright);
-    border-radius: 50%;
-    display: inline-block;
-    animation: pulse 2s infinite;
+  .nav-logo-img {
+    width: 24px;
+    height: 24px;
+  }
+  .navbar.scrolled .nav-logo span {
+    background: linear-gradient(135deg, var(--white-snow), #a3a9b0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transition: color 0.3s ease;
   }
   @keyframes pulse {
     0%, 100% { transform: scale(1); opacity: 1; }
@@ -123,7 +166,7 @@ const style = `
     list-style: none;
   }
   .nav-links li a {
-    color: var(--text-muted);
+    color: var(--white-snow);
     text-decoration: none;
     font-family: 'Syne', sans-serif;
     font-size: 0.85rem;
@@ -133,17 +176,21 @@ const style = `
     transition: color 0.3s ease;
     position: relative;
   }
+  .navbar.scrolled .nav-links li a {
+    color: var(--white-snow);
+    transition: color 0.3s ease;
+  }
   .nav-links li a::after {
     content: '';
     position: absolute;
     bottom: -4px; left: 0;
     width: 0; height: 1px;
-    background: linear-gradient(90deg, var(--purple-core), var(--purple-bright));
+    background: linear-gradient(90deg, var(--white-snow), var(--gray));
     transition: width 0.3s ease;
   }
   .nav-links li a:hover { color: var(--white); }
   .nav-links li a:hover::after { width: 100%; }
-  .nav-links li a.active { color: var(--purple-light); }
+  .nav-links li a.active { color: var(--gray); }
   .nav-links li a.active::after { width: 100%; }
 
   .hamburger {
@@ -159,10 +206,11 @@ const style = `
     display: block;
     width: 24px;
     height: 2px;
-    background: var(--white);
+    background: var(--charcoal);
     border-radius: 2px;
     transition: all 0.3s ease;
   }
+  .navbar.scrolled .hamburger span { background: var(--white-soft); }
   .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
   .hamburger.open span:nth-child(2) { opacity: 0; }
   .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
@@ -170,7 +218,7 @@ const style = `
   .mobile-menu {
     position: fixed;
     top: 70px; left: 0; right: 0;
-    background: rgba(26,5,51,0.97);
+    background: var(--charcoal);
     backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--glass-border);
     padding: 1.5rem 5%;
@@ -178,10 +226,14 @@ const style = `
     flex-direction: column;
     gap: 1.2rem;
     z-index: 99;
-    transform: translateY(-120%);
+    transform: translateY(-130%);
     transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
   }
-  .mobile-menu.open { transform: translateY(0); }
+  .mobile-menu.open {
+    transform: translateY(5%);
+    border-radius: 18px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  }
   .mobile-menu a {
     color: var(--text-muted);
     text-decoration: none;
@@ -194,7 +246,10 @@ const style = `
     border-bottom: 1px solid var(--glass-border);
     transition: color 0.3s;
   }
-  .mobile-menu a:hover { color: var(--purple-light); }
+  .mobile-menu a:hover { color: var(--white-soft); }
+  .mobile-menu .navbar.scrolled .nav-logo {
+    overflow: hidden;
+  }
 
   section {
     position: relative;
@@ -217,28 +272,6 @@ const style = `
     margin: 0 auto;
   }
   .hero-content { flex: 1; max-width: 600px; }
-  .hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--glass);
-    border: 1px solid var(--glass-border);
-    border-radius: 50px;
-    padding: 6px 16px;
-    font-family: 'Syne', sans-serif;
-    font-size: 0.75rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--purple-light);
-    margin-bottom: 1.5rem;
-    animation: fadeInUp 0.8s ease both;
-  }
-  .badge-dot {
-    width: 6px; height: 6px;
-    background: var(--purple-bright);
-    border-radius: 50%;
-    animation: pulse 1.5s infinite;
-  }
 
   .hero-title {
     font-family: 'Cormorant Garamond', serif;
@@ -250,11 +283,12 @@ const style = `
   }
   .hero-title .line2 {
     display: block;
-    background: linear-gradient(135deg, var(--purple-core), var(--purple-bright), var(--purple-glow));
+    background: linear-gradient(135deg, var(--purple-core), var(--charcoal), var(--purple-glow));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
   .hero-subtitle {
+    font-family: 'Inter Variable', sans-serif;
     font-size: 1.1rem;
     color: var(--text-muted);
     line-height: 1.7;
@@ -270,7 +304,7 @@ const style = `
   }
   .btn-primary {
     padding: 14px 32px;
-    background: linear-gradient(135deg, var(--purple-core), var(--purple-bright));
+    background: linear-gradient(135deg, var(--gray), var(--charcoal));
     border: none;
     border-radius: 50px;
     color: white;
@@ -280,18 +314,18 @@ const style = `
     letter-spacing: 1px;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 0 30px rgba(124,58,237,0.4);
+    box-shadow: 0 0 30px rgba(244, 246, 249, 0.2);
   }
   .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 0 50px rgba(124,58,237,0.6);
+    box-shadow: 0 0 50px rgba(244, 246, 249, 0.4);
   }
   .btn-outline {
     padding: 14px 32px;
     background: transparent;
-    border: 1px solid var(--glass-border);
+    border: 1px solid var(--gray);
     border-radius: 50px;
-    color: var(--purple-light);
+    color: var(--white-snow);
     font-family: 'Syne', sans-serif;
     font-size: 0.9rem;
     font-weight: 600;
@@ -301,8 +335,8 @@ const style = `
     backdrop-filter: blur(8px);
   }
   .btn-outline:hover {
-    border-color: var(--purple-core);
-    background: rgba(124,58,237,0.1);
+    border-color: var(--white-snow);
+    background: var(--charcoal);
     transform: translateY(-2px);
   }
 
@@ -375,7 +409,7 @@ const style = `
   }
   .stat-card strong {
     display: block;
-    font-family: 'Syne', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 1.1rem;
     color: var(--purple-light);
   }
@@ -392,11 +426,11 @@ const style = `
   }
 
   .section-label {
-    font-family: 'Syne', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 0.75rem;
     letter-spacing: 3px;
     text-transform: uppercase;
-    color: var(--purple-bright);
+    color: var(--white-snow);
     margin-bottom: 0.8rem;
     display: flex;
     align-items: center;
@@ -409,14 +443,14 @@ const style = `
     flex-shrink: 0;
   }
   .section-title {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: clamp(2.2rem, 5vw, 3.5rem);
     font-weight: 700;
     line-height: 1.15;
     margin-bottom: 1rem;
   }
   .section-title .accent {
-    background: linear-gradient(135deg, var(--purple-core), var(--purple-bright));
+    background: linear-gradient(135deg, var(--purple-core), var(--white-soft));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }
@@ -450,7 +484,7 @@ const style = `
     border-color: var(--purple-core);
     box-shadow: 0 0 30px rgba(124,58,237,0.2);
   }
-  .about-card:first-child { grid-column: span 2; }
+  .about-card:nth-child(3) { grid-column: span 2; }
   .card-icon {
     font-size: 1.8rem;
     margin-bottom: 0.8rem;
@@ -483,138 +517,107 @@ const style = `
     background: linear-gradient(90deg, transparent, var(--glass-border), transparent);
   }
 
-  #image {
+  #gallery {
     padding: 100px 8%;
   }
-  .slider-container {
-    max-width: 800px;
-    margin: 3rem auto 0;
-    position: relative;
-  }
-  .slider-track-wrapper {
-    overflow: hidden;
-    border-radius: 20px;
-    position: relative;
-  }
-  .slider-track {
+  .curved-carousel-wrapper {
+    width: 100%;
+    padding: 40px 0;
     display: flex;
-    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-  }
-  .slide {
-    min-width: 100%;
-    height: 500px;
-    position: relative;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     overflow: hidden;
   }
-  .slide-bg {
-    width: 100%; height: 100%;
+
+  /* KUNCI PERSPEKTIF 3D */
+  .curved-carousel-container {
+    position: relative;
+    width: 100%;
+    max-width: 1000px;
+    height: 360px; /* Tinggi kontainer carousel */
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
-  }
-  .slide-1 .slide-bg {
-    background: linear-gradient(135deg, #1a0533 0%, #3b0764 50%, #7c3aed 100%);
-  }
-  .slide-2 .slide-bg {
-    background: linear-gradient(135deg, #0f0527 0%, #4c1d95 40%, #6d28d9 100%);
-  }
-  .slide-3 .slide-bg {
-    background: linear-gradient(135deg, #1e0245 0%, #7e22ce 50%, #a855f7 100%);
-  }
-  .slide-4 .slide-bg {
-    background: linear-gradient(135deg, #120230 0%, #5b21b6 50%, #8b5cf6 100%);
-  }
-  .slide-5 .slide-bg {
-    background: linear-gradient(135deg, #160338 0%, #4a044e 50%, #9333ea 100%);
+    perspective: 1200px; /* ruang kedalaman 3D */
+    transform-style: preserve-3d;
   }
 
-  .slide-geometric {
+  /* ELEMEN KARTU */
+  .curved-card {
     position: absolute;
-    inset: 0;
+    width: 560px;
+    height: 320px;
+    border-radius: 16px;
     overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+    background-color: #1a1a1a;
+
+    /* Transisi halus saat bergeser */
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform, opacity;
   }
-  .geo-circle {
+
+  /* GAMBAR SERTIFIKAT */
+  .card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Menyesuaikan gambar secara rapi ke dalam kartu */
+    display: block;
+  }
+
+  /* TEKS OVERLAY DI ATAS GAMBAR */
+  .card-content {
     position: absolute;
-    border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.1);
-  }
-  .slide-content {
-    position: relative;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px 20px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.85), transparent);
+    color: #ffffff;
     z-index: 2;
-    text-align: center;
-    padding: 2rem;
-  }
-  .slide-emoji { font-size: 4rem; margin-bottom: 1rem; }
-  .slide-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 0.8rem;
-  }
-  .slide-desc {
-    font-size: 1rem;
-    color: var(--purple-light);
-    max-width: 400px;
-    margin: 0 auto;
-    line-height: 1.6;
-  }
-  .slide-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(0deg, rgba(26,5,51,0.7) 0%, transparent 50%);
-    z-index: 1;
   }
 
-  .slider-controls {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1.5rem;
-    margin-top: 2rem;
+  .card-content h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
   }
-  .slider-btn {
-    width: 48px; height: 48px;
-    border-radius: 50%;
-    background: var(--glass);
-    border: 1px solid var(--glass-border);
-    color: white;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(8px);
-  }
-  .slider-btn:hover {
-    background: var(--purple-core);
-    border-color: var(--purple-core);
-    box-shadow: 0 0 20px rgba(124,58,237,0.4);
-  }
-  .slider-dots {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-  }
-  .dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.2);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: none;
-  }
-  .dot.active {
-    width: 24px;
-    border-radius: 4px;
-    background: var(--purple-bright);
-  }
-  .slide-counter {
-    font-family: 'Syne', sans-serif;
+
+  .card-content p {
+    margin: 4px 0 0 0;
     font-size: 0.85rem;
-    color: var(--text-muted);
-    letter-spacing: 2px;
+    opacity: 0.8;
+  }
+
+  /* TOMBOL NAVIGASI */
+  .carousel-controls {
+    margin-top: 30px;
+    display: flex;
+    gap: 16px;
+    z-index: 20;
+  }
+
+  .carousel-controls button {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #171717;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+  }
+
+  .carousel-controls button:hover {
+    background-color: #333333;
   }
 
   #skills {
@@ -646,8 +649,8 @@ const style = `
     transition: all 0.3s ease;
   }
   .skill-category:hover {
-    border-color: var(--purple-core);
-    box-shadow: 0 0 40px rgba(124,58,237,0.15);
+    border-color: var(--gray);
+    box-shadow: 0 0 40px rgba(244, 246, 249, 0.08);
     transform: translateY(-4px);
   }
   .skill-cat-header {
@@ -659,7 +662,7 @@ const style = `
   .skill-cat-icon {
     width: 42px; height: 42px;
     border-radius: 10px;
-    background: linear-gradient(135deg, var(--purple-core), var(--purple-bright));
+    background: linear-gradient(135deg, var(--purple-core), var(--charcoal));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -699,7 +702,7 @@ const style = `
   .skill-fill {
     height: 100%;
     border-radius: 2px;
-    background: linear-gradient(90deg, var(--purple-core), var(--purple-bright));
+    background: linear-gradient(90deg, var(--purple-core), var(--charcoal));
     transition: width 1.5s cubic-bezier(0.23, 1, 0.32, 1);
     width: 0;
     box-shadow: 0 0 8px rgba(168,85,247,0.6);
@@ -747,7 +750,7 @@ const style = `
     color: var(--text-muted);
   }
   .upload-hint span {
-    color: var(--purple-bright);
+    color: var(--charcoal);
     font-weight: 600;
   }
   .upload-formats {
@@ -759,13 +762,6 @@ const style = `
     text-transform: uppercase;
   }
 
-  .gallery-thumbs {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-top: 1.5rem;
-    justify-content: center;
-  }
   .thumb-item {
     position: relative;
     width: 72px;
@@ -778,7 +774,7 @@ const style = `
     flex-shrink: 0;
   }
   .thumb-item.active {
-    border-color: var(--purple-bright);
+    border-color: var(--charcoal);
     box-shadow: 0 0 14px rgba(168,85,247,0.5);
   }
   .thumb-item img {
@@ -863,7 +859,7 @@ const style = `
   .caption-input::placeholder { color: rgba(196,181,212,0.35); }
   .caption-save-btn {
     padding: 10px 20px;
-    background: linear-gradient(135deg, var(--purple-core), var(--purple-bright));
+    background: linear-gradient(135deg, var(--purple-core), var(--charcoal));
     border: none;
     border-radius: 10px;
     color: white;
@@ -997,7 +993,7 @@ const style = `
   .submit-btn {
     width: 100%;
     padding: 14px;
-    background: linear-gradient(135deg, var(--purple-core), var(--purple-bright));
+    background: linear-gradient(135deg, var(--purple-core), var(--charcoal));
     border: none;
     border-radius: 12px;
     color: white;
@@ -1022,7 +1018,7 @@ const style = `
     color: var(--text-muted);
     font-size: 0.85rem;
   }
-  footer span { color: var(--purple-bright); }
+  footer span { color: var(--charcoal); }
 
   @media (max-width: 1024px) {
     .hero-inner { flex-direction: column; text-align: center; }
@@ -1038,32 +1034,31 @@ const style = `
     .hamburger { display: flex; }
     .hero-inner { padding-top: 2rem; }
     .avatar-frame { width: 220px; height: 220px; }
-    .slide { height: 340px; }
+    .curved-carousel-container { height: 260px; perspective: 700px; }
+    .curved-card { height: 340px; width: 78vw; max-width: 310px; border-radius: 12px; }
+    .card-content { padding: 12px 14px; }
+    .card-content h3 { font-size: 1rem; }
+    .card-content p { font-size: 0.75rem; }
+    .card-controls { margin-top: 20px; gap: 12px; }
+    .card-controls button { width: 38px; height: 38px; font-size: 1rem; }
     .form-row { grid-template-columns: 1fr; }
     .skills-header { flex-direction: column; align-items: flex-start; }
     .about-cards { grid-template-columns: 1fr; }
-    .about-card:first-child { grid-column: span 1; }
+    .about-card:nth-child(3) { grid-column: span 1; }
   }
 
   @media (max-width: 480px) {
-    #home, #about, #image, #skills, #contact { padding-left: 5%; padding-right: 5%; }
+    #home, #about, #gallery, #skills, #contact { padding-left: 5%; padding-right: 5%; }
     .avatar-frame { width: 180px; height: 180px; }
-    .slide { height: 250px; }
-    .slide-title { font-size: 1.8rem; }
+    .curved-carousel-container { height: 230px; perspective: 550px; }
+    .curved-card { height: 175px; width: 82vw; max-width: 270px; }
+    .card-content { font-size: 1.8rem; }
     .contact-form { padding: 1.5rem; }
   }
 
   .fade-in { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
   .fade-in.visible { opacity: 1; transform: translateY(0); }
 `;
-
-const slides = [
-  { id: 1, src: "/Image/CCSE.jpg", title: "CCSE", desc: "Certificate CCSE" },
-  { id: 2, src: "/Image/DicodingDev.jpg", title: "Dicoding", desc: "Certificate Dicoding Developer" },
-  { id: 3, src: "/Image/HTML.jpg", title: "HTML", desc: "Certificate HTML" },
-  { id: 4, src: "/Image/Python-Algorithm.png", title: "Algorithm with Python", desc: "Certificate Python Algorithm" },
-  { id: 5, src: "/Image/Python-Lanjutan.jpg", title: "Python Lanjutan", desc: "Certificate Python Lanjutan" },
-];
 
 const skillCategories = [
   {
@@ -1092,20 +1087,18 @@ const skillCategories = [
   },
 ];
 
-const navItems = ["Home", "About", "Image", "Skills", "Contact"];
+const navItems = ["Home", "About", "Skills", "Gallery", "Contact"];
 
 export default function Portfolio() {
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
   const [menuOpen, setMenuOpen] = useState(false);
-  const [slideIndex, setSlideIndex] = useState(0);
   const [skillsVisible, setSkillsVisible] = useState(false);
   const skillsRef = useRef(null);
-  const autoplayRef = useRef(null);
 
   useEffect(() => {
     const onScroll = () => {
-      setScrolled(window.scrollY > 30);
+      setScrolled(window.scrollY > 50);
       const sections = navItems.map(n => n.toLowerCase());
       for (const sec of sections.reverse()) {
         const el = document.getElementById(sec);
@@ -1135,21 +1128,6 @@ export default function Portfolio() {
     return () => observer.disconnect();
   }, []);
 
-  useEffect(() => {
-    autoplayRef.current = setInterval(() => {
-      setSlideIndex(i => (i + 1) % slides.length);
-    }, 4000);
-    return () => clearInterval(autoplayRef.current);
-  }, []);
-
-  const goSlide = (dir) => {
-    clearInterval(autoplayRef.current);
-    setSlideIndex(i => (i + dir + slides.length) % slides.length);
-    autoplayRef.current = setInterval(() => {
-      setSlideIndex(i => (i + 1) % slides.length);
-    }, 4000);
-  };
-
   const scrollTo = (id) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
     setMenuOpen(false);
@@ -1157,14 +1135,15 @@ export default function Portfolio() {
 
   return (
     <>
+      <CursorRevealBg />
       <style>{style}</style>
-      <div className="bg-grid" />
       <div className="bg-orb bg-orb-1" />
       <div className="bg-orb bg-orb-2" />
 
       <nav className={`navbar ${scrolled ? "scrolled" : ""}`}>
         <div className="nav-logo">
-          <span>Port</span>folio<div className="logo-dot" />
+          <img src="/Logo.svg" alt="Logo" className="nav-logo-img" />
+          <span>Ahmad</span>Dev
         </div>
         <ul className="nav-links">
           {navItems.map(item => (
@@ -1203,10 +1182,6 @@ export default function Portfolio() {
       <section id="home">
         <div className="hero-inner">
           <div className="hero-content">
-            <div className="hero-badge">
-              <div className="badge-dot" />
-              Available for Work
-            </div>
             <h1 className="hero-title">
               Hi I'm<br />
               <span className="line2">Ahmad Wildan</span><br />
@@ -1217,7 +1192,7 @@ export default function Portfolio() {
             </p>
             <div className="hero-cta">
               <button className="btn-primary" onClick={() => scrollTo("contact")}>
-                Let's Collaborate
+                Get in Touch
               </button>
               <button className="btn-outline" onClick={() => scrollTo("skills")}>
                 View Skills
@@ -1263,11 +1238,6 @@ export default function Portfolio() {
           </div>
           <div className="about-cards">
             <div className="about-card">
-              <div className="card-icon">🎯</div>
-              <div className="card-title">Mission</div>
-              <p className="card-text">Terus memperbaiki diri dan menciptakan solusi digital yang bermakna.</p>
-            </div>
-            <div className="about-card">
               <div className="card-icon">🌍</div>
               <div className="card-title">Location</div>
               <p className="card-text">Tinggal Malang, Indonesia. Bersedia untuk bekerja remote.</p>
@@ -1277,73 +1247,11 @@ export default function Portfolio() {
               <div className="card-title">Education</div>
               <p className="card-text">Mahasiswa Teknik Informatika di STT STIKMA Malang.</p>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="image">
-        <div className="section-divider" />
-        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "4rem 8% 0" }}>
-          <div className="fade-in">
-            <p className="section-label">Portfolio</p>
-            <h2 className="section-title">
-              Certificate <span className="accent">Gallery</span>
-            </h2>
-          </div>
-        </div>
-        <div className="slider-container fade-in">
-          
-          <div className="slider-track-wrapper">
-            <div
-              className="slider-track"
-              style={{ transform: `translateX(-${slideIndex * 100}%)` }}
-            >
-              {slides.map((slide) => (
-                <div key={slide.id} className="slide">
-                  <div style={{ position: "relative", width: "100%", height: "100%" }}>
-                    <img
-                      src={slide.src}
-                      alt={slide.title}
-                      className="slide-img"
-                    />
-                    <div className="slide-img-overlay" />
-                    <div className="slide-img-caption">
-                      <h3>{slide.title}</h3>
-                      {slide.desc && <p>{slide.desc}</p>}
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <div className="about-card">
+              <div className="card-icon">🎯</div>
+              <div className="card-title">Mission</div>
+              <p className="card-text">Terus memperbaiki diri dan menciptakan solusi digital yang bermakna.</p>
             </div>
-          </div>
-
-          <div className="slider-controls">
-            <button className="slider-btn" onClick={() => goSlide(-1)}>←</button>
-            <div className="slider-dots">
-              {slides.map((_, i) => (
-                <button
-                  key={i}
-                  className={`dot ${i === slideIndex ? "active" : ""}`}
-                  onClick={() => { clearInterval(autoplayRef.current); setSlideIndex(i); }}
-                />
-              ))}
-            </div>
-            <button className="slider-btn" onClick={() => goSlide(1)}>→</button>
-          </div>
-          <div className="slide-counter" style={{ textAlign: "center", marginTop: "0.8rem" }}>
-            {String(slideIndex + 1).padStart(2, "0")} / {String(slides.length).padStart(2, "0")}
-          </div>
-
-          <div className="gallery-thumbs">
-            {slides.map((slide, i) => (
-              <div
-                key={slide.id}
-                className={`thumb-item ${i === slideIndex ? "active" : ""}`}
-                onClick={() => { clearInterval(autoplayRef.current); setSlideIndex(i); }}
-              >
-                <img src={slide.src} alt={slide.title} />
-              </div>
-            ))}
           </div>
         </div>
       </section>
@@ -1389,6 +1297,19 @@ export default function Portfolio() {
         </div>
       </section>
 
+      <section id="gallery">
+        <div className="section-divider" />
+        <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "4rem 8% 0" }}>
+          <div className="fade-in">
+            <p className="section-label">Portfolio</p>
+            <h2 className="section-title">
+              <span className="accent">Gallery</span>
+            </h2>
+          </div>
+        </div>
+        <GalleryCarousel />
+      </section>
+
       <section id="contact">
         <div className="section-divider" />
         <div className="contact-inner" style={{ paddingTop: "2rem" }}>
@@ -1419,11 +1340,11 @@ export default function Portfolio() {
             <div className="form-row">
               <div className="form-group">
                 <label>First Name</label>
-                <input type="text" className="form-control" placeholder="John" />
+                <input type="text" className="form-control" placeholder="Nama" />
               </div>
               <div className="form-group">
                 <label>Last Name</label>
-                <input type="text" className="form-control" placeholder="Doe" />
+                <input type="text" className="form-control" placeholder="Kamu" />
               </div>
             </div>
             <div className="form-group">

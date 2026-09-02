@@ -1,16 +1,47 @@
-# React + Vite
+# Ahmad Dev - Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Website portfolio yang menyajikan informasi tentang data diri.
 
-Currently, two official plugins are available:
+Yang dibangun menggunakan React Vite, dan fontsource.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## React Compiler
+## 📋 Prasyarat
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Pastikan perangkat Anda sudah terpasang:
 
-## Expanding the ESLint configuration
+| Tools | Versi Minimum | Cara Cek |
+|-------|---------------|----------|
+| [Node.js](https://nodejs.org) | v20+ (disarankan LTS) | `node -v` |
+| npm | v10+ (bawaan Node.js) | `npm -v` |
+| Git | v2.30+ | `git --version` |
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## Proses Instalasi & Menjalankan Portofolio
+
+### 1. Clone Repository
+```bash
+git clone <repository-url>
+```
+
+### 2. Install Dependencies & Font
+```bash
+npm install
+npm install @fontsource/<font-name>
+```
+
+### 3. Jalankan Development Server
+```bash
+npm run dev
+```
+
+### 4. Build untuk Produksi
+```bash
+npm run build
+```
+
+### 5. Jalankan Production Server
+```bash
+npm run preview
+```
