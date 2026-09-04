@@ -67,7 +67,7 @@ const style = `
 
   .main-content {
     position: relative;
-    z-index: 2; /* Mengapung di atas layer background */
+    z-index: 2;
   }
 
   .bg-orb {
@@ -804,7 +804,7 @@ const style = `
     .nav-links { display: none; }
     .hamburger { display: flex; }
     .hero-inner { padding-top: 2rem; }
-    .avatar-frame { width: 220px; height: 220px; }
+    .hero-visual { max-width: 220px; margin-top: 2rem; height: 320px; }
     .curved-carousel-container { height: 260px; perspective: 700px; }
     .curved-card { height: 340px; width: 78vw; max-width: 310px; border-radius: 12px; }
     .card-content { padding: 12px 14px; }
@@ -820,7 +820,7 @@ const style = `
 
   @media (max-width: 480px) {
     #home, #about, #gallery, #skills, #contact { padding-left: 5%; padding-right: 5%; }
-    .avatar-frame { width: 180px; height: 180px; }
+    .hero-visual { width: 180px; height: 200px; }
     .curved-carousel-container { height: 230px; perspective: 550px; }
     .curved-card { height: 175px; width: 82vw; max-width: 270px; }
     .card-content { font-size: 1.8rem; }
@@ -835,15 +835,15 @@ const skillCategories = [
   {
     icon: "⚡", name: "Frontend",
     skills: [
-      { name: "React / Next.js", level: 32 },
-      { name: "TypeScript", level: 5 },
-      { name: "CSS / Tailwind", level: 70 },
+      { name: "React / Next.js", level: 55 },
+      { name: "TypeScript", level: 30 },
+      { name: "CSS / Tailwind", level: 60 },
     ]
   },
   {
     icon: "🛠", name: "Backend",
     skills: [
-      { name: "Node.js", level: 20 },
+      { name: "Node.js", level: 40 },
       { name: "Python / Django", level: 65 },
       { name: "REST / GraphQL", level: 0 },
     ]
@@ -851,9 +851,9 @@ const skillCategories = [
   {
     icon: "🎨", name: "Design",
     skills: [
-      { name: "Figma", level: 10 },
-      { name: "UI/UX Principles", level: 25 },
-      { name: "Motion Design", level: 0 },
+      { name: "Figma", level: 40 },
+      { name: "UI/UX Principles", level: 45 },
+      { name: "Motion Design", level: 5 },
     ]
   },
 ];
